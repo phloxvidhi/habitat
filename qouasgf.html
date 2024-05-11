@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Screen</title>
+    <style>
+      body {
+            font-family: 'Inter', sans-serif;
+            background-color: #64B3B3;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .left-rectangle,
+        .right-rectangle {
+            width: 707px;
+            height: 622px;
+            background-color: #70CBC7;
+            position: relative;
+            border-radius: 18px;
+        }
+
+        .left-rectangle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 18px;
+        }
+
+        .right-rectangle {
+            margin-left: 20px;
+        }
+
+    
+
+        .help-button {
+
+            width: 80px;
+            height: 24px;
+            padding-left: 40px;
+            padding-top:  10px;
+            background-color: #279EB8; /* Updated color */
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #E8FFFD;
+            position: absolute;
+            top: 50px;
+            right: 60px;
+        }
+
+        
+
+        .go-back-button,
+        .retake-button {
+            width: 140px;
+            height: 40px;
+            padding: 5px 10px;
+            background-color: #01183F; /* Updated color */
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #E8FFFD;
+        }
+
+        .go-back-button {
+            margin-right: 10px;
+        }
+
+        .done-button {
+            width: 140px;
+            height: 40px;
+            padding: 5px 10px;
+            background-color: #65C163; /* Updated color */
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #E8FFFD;
+        }
+
+        .repeat-button {
+
+width: 140px;
+height: 40px;
+padding: 5px 10px;
+background-color: #279EB8; /* Updated color */
+cursor: pointer;
+border: none;
+border-radius: 4px;
+font-family: 'Inter', sans-serif;
+font-size: 16px;
+color: #E8FFFD;
+}
+
+
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .audio-controls button {
+            margin: 0 10px;
+        }
+
+        .speech-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .speech-controls button {
+            margin: 0 10px;
+        }
+
+        .gif-container {
+
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50%;
+        }
+
+        .gif-container img {
+            max-width: 100%;
+            max-height: 100%;
+            mix-blend-mode: luminosity;
+        }
+
+        .message,
+        .text {
+            text-align: center;
+            margin-top: -20px;
+            color: #E8FFFD;
+            font-size: 18px;
+        }
+
+        .speech-to-text-container.hidden {
+            display: none;
+        }
+
+        #speech-to-text {
+            margin: 40px;
+            font-style: italic;
+            color: rgb(255, 255, 255); /* Transparent black */
+            background-color: rgba(34, 34, 34, 0.427); /* Transparent background */
+            padding: 5px;
+            border-radius: 10px;
+font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-rectangle">
+            <img src="E:\Documents\innteractionn design hw\Habitat\New folder\Frame 12.png" alt="Image">
+        </div>
+        <div class="right-rectangle">
+            <div class="help-button">Help</div>
+            <div class="gif-container">
+                <img src="E:\Documents\innteractionn design hw\Habitat\voice-gif--unscreen.gif" alt="GIF">
+            </div>
+            <p class="message">[So tell me Mrs. Shanti Koli ...how are you feeling...I'm listening]</p>
+            <div class="audio-controls">
+                <audio id="audio" src="E:\Documents\innteractionn design hw\Habitat\codes\code asset habitat\how.mp3"></audio>
+                <button class="go-back-button" id="go-back">↩ Go Back</button>
+                <button class="repeat-button" id="Repeat">⟳ Repeat</button>
+            </div>
+            <div class="speech-to-text-container hidden">
+                <audio id="doneaudio" src="E:\Documents\innteractionn design hw\Habitat\codes\code asset habitat\ana.mp3"></audio>
+                <p class="text">Listening..</p>
+                <div id="speech-to-text"></div>
+                <div class="speech-controls">
+                    <button class="retake-button" id="⟳retake">⟳ Retake</button>
+                    <button class="done-button" id="done">Done!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioElement = document.getElementById('audio');
+        const doneaudioElement = document.getElementById('doneaudio');
+        const goBackButton = document.querySelector('.go-back-button');
+        const repeatButton = document.querySelector('.repeat-button');
+        const speechToTextContainer = document.querySelector('.speech-to-text-container');
+        const retakeButton = document.querySelector('.retake-button');
+        const doneButton = document.querySelector('.done-button');
+        const speechToTextElement = document.getElementById('speech-to-text');
+        const audioControls = document.getElementById('audio-controls');
+        const helpButton = document.querySelector('.help-button');
+        const message = document.querySelector('.message');
+
+        let speechRecognition;
+        let isListening = false;
+
+        // Play the audio when someone clicks anywhere on the screen or presses any key
+        document.addEventListener('click', playAudio);
+        document.addEventListener('keydown', playAudio);
+
+        function playAudio() {
+            audioElement.play();
+            document.removeEventListener('click', playAudio);
+            document.removeEventListener('keydown', playAudio);
+        }
+
+        // Handle audio controls
+        goBackButton.addEventListener('click', () => {
+            // Go back functionality
+        });
+
+        repeatButton.addEventListener('click', () => {
+            audioElement.currentTime = 0;
+            audioElement.play();
+        });
+
+        // Show speech-to-text container after 1 seconds
+        setTimeout(() => {
+            speechToTextContainer.classList.remove('hidden');
+            document.getElementsByClassName('audio-controls')[0].style.visibility = 'hidden';
+            message.style.visibility = 'hidden';
+            startSpeechRecognition();
+        }, 10000);
+
+        // Handle speech recognition
+        function startSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                speechRecognition = new webkitSpeechRecognition();
+                speechRecognition.continuous = true;
+                speechRecognition.interimResults = true;
+                speechRecognition.lang = 'en-US';
+
+                speechRecognition.addEventListener('result', (event) => {
+                    const transcript = Array.from(event.results)
+                        .map((result) => result[0].transcript)
+                        .join('');
+                    speechToTextElement.textContent = transcript;
+                });
+
+                speechRecognition.addEventListener('end', () => {
+                    isListening = false;
+                });
+
+                speechRecognition.start();
+                isListening = true;
+            } else {
+                console.log('Speech recognition not supported');
+            }
+        }
+
+        // Handle speech controls
+        retakeButton.addEventListener('click', () => {
+            speechToTextElement.textContent = '';
+            startSpeechRecognition();
+        });
+
+        doneButton.addEventListener('click', () => {
+    speechRecognition.stop();
+    doneaudioElement.currentTime = 0;
+    doneaudioElement.play();
+
+    setTimeout(() => {
+        window.location.href = 'https://www.figma.com/proto/oXFrzbuO1XtdNqiZu5tONr/Doctor-screen-(habitat-(Copy)?page-id=2183%3A7&type=design&node-id=2183-64&viewport=101%2C150%2C0.11&t=50YWCbYWjRruARHY-1&scaling=min-zoom&mode=design';
+    }, 4000); // Wait for 5 seconds (5000 milliseconds)
+});
+    
+
+    
+        // Go back to the initial state when "Help" button is clicked
+        helpButton.addEventListener('click', () => {
+            audioElement.currentTime = 0;
+            audioElement.play();
+            speechToTextContainer.classList.add('hidden');
+            document.getElementsByClassName('audio-controls')[0].style.visibility = 'visible';
+            message.style.visibility = 'visible';
+        });
+    </script>
+</body>
+</html>
